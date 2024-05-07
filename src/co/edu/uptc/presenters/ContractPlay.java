@@ -1,16 +1,22 @@
 package co.edu.uptc.presenters;
 
+import java.util.List;
+
+import co.edu.uptc.pojos.AlienPojo;
+
 public interface ContractPlay {
     public interface  Model {
         public void setPresenter(Presenter presenter);
         public void start();
         public void stop();
+        public List<AlienPojo> getAliensPojo();
+        
         
     }
     public interface View {
         public void setPresenter(Presenter presenter);
         public void begin();
-        
+
     }
 
     public interface Presenter {
@@ -19,7 +25,7 @@ public interface ContractPlay {
         public void begin();
 
         // model
-        public void setLimits(int horizontalLimit, int verticalLimit);
+        public List<AlienPojo> getAliensPojo();
         public void start();
         public void stop();
         

@@ -13,20 +13,20 @@ public class CanonModel {
         if (running) {
             if (direction == DirectEnum.LEFT) {
                 left();
-            } else {
+            } else if (direction == DirectEnum.RIGHT) {
                 right();
             }
         }
     }
 
     private void left() {
-        if (canonPojo.getX() <= (canonPojo.getSize() / 2)) {
+        if (canonPojo.getX() <= 0) {
             canonPojo.setX(canonPojo.getX() - movement);
         }
     }
 
     private void right() {
-        if (canonPojo.getX() >= (horizontalLimit - (canonPojo.getSize() / 2))) {
+        if (canonPojo.getX() >= (horizontalLimit - canonPojo.getSize())) {
             canonPojo.setX(canonPojo.getX() + movement);
         }
     }

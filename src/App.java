@@ -1,5 +1,8 @@
+import co.edu.uptc.presenters.Presenter;
+
 public class App {
     public static void main(String[] args) throws Exception {
-        System.out.println("Hello, World!");
+        Presenter presenter = new Presenter();
+        presenter.begin();
     }
 }
