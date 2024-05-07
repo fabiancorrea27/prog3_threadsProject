@@ -6,15 +6,19 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import co.edu.uptc.pojos.AlienPojo;
+import co.edu.uptc.pojos.CanonPojo;
+import co.edu.uptc.utils.ImagesUtil;
 import co.edu.uptc.utils.Util;
 
 public class WorkPanel extends JPanel {
     private Dashboard dashboard;
     // private boolean running;
-    private BufferedImage image;
+    private BufferedImage alienImage;
+    private BufferedImage canonImage;
 
     public WorkPanel(){
-        image = Util.alienImage();
+        alienImage = ImagesUtil.alienImage();
+        canonImage = ImagesUtil.canonImage();
     }
 
     public void setDashboard(Dashboard dashboard) {
@@ -24,9 +28,10 @@ public class WorkPanel extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-            for (AlienPojo alienPojo : dashboard.getAliensPojo()) {
-                g.drawImage(image, alienPojo.getX(), alienPojo.getY(), null);
+            for (AlienPojo alienPojo : dashboard.getPresenter().getAliensPojo()) {
+                g.drawImage(alienImage, alienPojo.getX(), alienPojo.getY(), null);
             }
+            g.drawImage(canonImage, dashboard.getPresenter().getCanonPojo().getX(), dashboard.getPresenter().getCanonPojo().getY(), null);
     }
 
     public void threadPaint(){

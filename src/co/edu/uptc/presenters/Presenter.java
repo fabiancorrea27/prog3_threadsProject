@@ -4,6 +4,8 @@ import java.util.List;
 
 import co.edu.uptc.models.GameManager;
 import co.edu.uptc.pojos.AlienPojo;
+import co.edu.uptc.pojos.BulletPojo;
+import co.edu.uptc.pojos.CanonPojo;
 import co.edu.uptc.presenters.ContractPlay.Model;
 import co.edu.uptc.presenters.ContractPlay.View;
 import co.edu.uptc.views.Dashboard;
@@ -53,6 +55,16 @@ public class Presenter implements ContractPlay.Presenter {
     public void stop() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'stop'");
+    }
+
+    @Override
+    public List<BulletPojo> getBulletsPojo() {
+        return model.getBulletsPojo();
+    }
+
+    @Override
+    public CanonPojo getCanonPojo() {
+       return model.getCanonPojo();
     }
 
 }

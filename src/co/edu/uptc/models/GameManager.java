@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.uptc.pojos.AlienPojo;
+import co.edu.uptc.pojos.BulletPojo;
+import co.edu.uptc.pojos.CanonPojo;
 import co.edu.uptc.presenters.ContractPlay;
 import co.edu.uptc.presenters.ContractPlay.Presenter;
 import co.edu.uptc.views.DirectEnum;
@@ -75,5 +77,19 @@ public class GameManager implements ContractPlay.Model{
             alienPojoList.add(alien.getAlienPojo());
         }
         return alienPojoList;
+    }
+
+    @Override
+    public List<BulletPojo> getBulletsPojo() {
+        List<BulletPojo> bulletPojoList = new ArrayList<BulletPojo>();
+        for(BulletModel bullet : bulletList) {
+            bulletPojoList.add(bullet.getBulletPojo());
+        }
+        return bulletPojoList;
+    }
+
+    @Override
+    public CanonPojo getCanonPojo() {
+       return canonModel.getCanonPojo();
     }
 }

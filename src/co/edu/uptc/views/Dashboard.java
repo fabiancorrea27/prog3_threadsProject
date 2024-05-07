@@ -11,7 +11,6 @@ import co.edu.uptc.presenters.ContractPlay.Presenter;
 public class Dashboard extends JFrame implements ContractPlay.View {
 
     private ContractPlay.Presenter presenter;
-    private List<AlienPojo> aliensPojo;
     private WorkPanel workPanel;
     
     public Dashboard(){
@@ -35,13 +34,12 @@ public class Dashboard extends JFrame implements ContractPlay.View {
 
     @Override
     public void begin() {
-        this.aliensPojo = this.presenter.getAliensPojo();
         workPanel.threadPaint();
         this.setVisible(true);
     }
 
-    public List<AlienPojo> getAliensPojo() {
-        return aliensPojo;
+    public ContractPlay.Presenter getPresenter() {
+        return presenter;
     }
     
 }

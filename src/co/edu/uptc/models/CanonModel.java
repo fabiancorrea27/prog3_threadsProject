@@ -38,4 +38,10 @@ public class CanonModel {
     public void stopMovement() {
         running = false;
     }
+
+    public CanonPojo getCanonPojo() {
+        return canonPojo;
+    }
+
+    
 }
