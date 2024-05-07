@@ -64,7 +64,19 @@ public class Presenter implements ContractPlay.Presenter {
 
     @Override
     public CanonPojo getCanonPojo() {
-       return model.getCanonPojo();
+        return model.getCanonPojo();
     }
+
+    @Override
+    public void setHorizontalLimit(int horizontalLimit) {
+       model.setHorizontalLimit(horizontalLimit);
+        
+    }
+
+    @Override
+    public void setVerticalLimit(int verticalLimit) {
+        model.setVerticalLimit(verticalLimit);
+    }
+    
 
 }

@@ -43,5 +43,15 @@ public class CanonModel {
         return canonPojo;
     }
 
-    
+    public void setHorizontalLimit(int horizontalLimit){
+        this.horizontalLimit = horizontalLimit;
+    }
+
+    public void setMovement(int movement){
+        this.movement = movement;
+    }
+
+    public int getHorizontalLimit(){
+        return this.horizontalLimit;
+    }
 }

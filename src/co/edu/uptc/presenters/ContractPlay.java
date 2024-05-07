@@ -14,23 +14,29 @@ public interface ContractPlay {
         public List<AlienPojo> getAliensPojo();
         public List<BulletPojo> getBulletsPojo();
         public CanonPojo getCanonPojo();
-        
+        public void setHorizontalLimit(int horizontalLimit);
+        public void setVerticalLimit(int verticalLimit);
     }
     public interface View {
         public void setPresenter(Presenter presenter);
         public void begin();
+        public int horizontalLimit();
+        public int verticalLimit();
 
     }
 
     public interface Presenter {
+        
         public void setModel(Model model);
         public void setView(View view);
         public void begin();
-
+        
         // model
         public List<AlienPojo> getAliensPojo();
         public List<BulletPojo> getBulletsPojo();
         public CanonPojo getCanonPojo();
+        public void setHorizontalLimit(int horizontalLimit);
+        public void setVerticalLimit(int verticalLimit);
         public void start();
         public void stop();
         
