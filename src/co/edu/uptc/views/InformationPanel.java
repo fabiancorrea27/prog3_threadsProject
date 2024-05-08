@@ -34,13 +34,13 @@ public class InformationPanel extends JPanel {
 
     private void createLblAliensAmount() {
         lblAliensAmount = new CustomLabel("0");
-        lblAliensAmount.setPreferredSize(new Dimension(30, 20));
+        lblAliensAmount.setPreferredSize(new Dimension(50, 20));
     }
 
     private void createLblAliensEliminatedAmount() {
         lblAliensEliminatedAmount = new CustomLabel("0");
         lblAliensEliminatedAmount.setForeground(Color.RED);
-        lblAliensEliminatedAmount.setPreferredSize(new Dimension(30, 20));
+        lblAliensEliminatedAmount.setPreferredSize(new Dimension(50, 20));
     }
 
     private void addComponents() {
