@@ -1,6 +1,6 @@
 package co.edu.uptc.pojos;
 
-public class BulletPojo {
+public class BulletPojo implements ObjectPojo{
     private int x;
     private int y;
     private int size;

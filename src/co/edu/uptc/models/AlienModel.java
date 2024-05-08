@@ -28,6 +28,7 @@ public class AlienModel {
                 }
             }
         });
+        thread.setName("Alien Movement Thread");
         thread.start();
     }
 

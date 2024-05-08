@@ -1,5 +1,6 @@
 package co.edu.uptc.models;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import co.edu.uptc.pojos.CanonPojo;
 import co.edu.uptc.presenters.ContractPlay;
 import co.edu.uptc.presenters.ContractPlay.Presenter;
 import co.edu.uptc.views.DirectEnum;
+import co.edu.uptc.pojos.ObjectPojo;
 
 public class GameManager implements ContractPlay.Model {
     private ContractPlay.Presenter presenter;
@@ -16,6 +18,7 @@ public class GameManager implements ContractPlay.Model {
     private List<BulletModel> bulletList = new ArrayList<BulletModel>();
     private CanonModel canonModel = new CanonModel();
     private int horizontalLimit, verticalLimit;
+    private final Object bulletLock = new Object();
 
     public GameManager() {
 
@@ -28,34 +31,41 @@ public class GameManager implements ContractPlay.Model {
 
     @Override
     public void start() {
-        createAliens();
-        createCanon();
-        createBullets();
+        createAndAddAliens();
+        createAndAddCanon();
+        createAndAddBullets();
         for (AlienModel alien : alienList) {
             alien.startMovement();
         }
         canonModel.startMovement();
+        checkAlienStrikeThread();
     }
 
-    private void createAliens() {
+    private void createAndAddAliens() {
         for (int i = 0; i < 5; i++) {
-            AlienModel alien = new AlienModel();
-            alien.getAlienPojo().setSize(50);
-            alien.setSpeed(10);
-            alien.getAlienPojo().setX(-alien.getAlienPojo().getSize());
-            alien.getAlienPojo().setY(-alien.getAlienPojo().getSize());
+            AlienModel alien = createAlien();
             alienList.add(alien);
         }
     }
 
-    private void createCanon() {
+    // Create a Alien with a initial position
+    private AlienModel createAlien() {
+        AlienModel alien = new AlienModel();
+        alien.getAlienPojo().setSize(50);
+        alien.setSpeed(10);
+        alien.getAlienPojo().setX(-alien.getAlienPojo().getSize());
+        alien.getAlienPojo().setY(-alien.getAlienPojo().getSize());
+        return alien;
+    }
+
+    private void createAndAddCanon() {
         CanonModel canon = new CanonModel();
         canon.getCanonPojo().setSize(60);
         canon.setSpeed(10);
         this.canonModel = canon;
     }
 
-    private void createBullets() {
+    private void createAndAddBullets() {
         for (int i = 0; i < 5; i++) {
             BulletModel bullet = new BulletModel();
             bullet.setSpeed(10);
@@ -110,20 +120,30 @@ public class GameManager implements ContractPlay.Model {
     private void putAlienYCoordinate() {
         // Set aliens y-coordinate on random position in the first half
         for (AlienModel alien : alienList) {
-            alien.getAlienPojo().setY((int) (Math.random() * (verticalLimit / 2)));
+            alien.getAlienPojo().setY(calculeteAlienYCoordinate());
         }
+    }
+
+    private int calculeteAlienYCoordinate() {
+        return ((int) (Math.random() * (verticalLimit / 2)));
     }
 
     private void putAlienXCoordenate() {
         for (AlienModel alien : alienList) {
             // Check aliens direction movement and set x coordenate accordingly
             alien.setHorizontalLimit(horizontalLimit);
-            if (alien.getMovementDirection() == DirectEnum.LEFT) {
-                alien.getAlienPojo().setX(alien.getHorizontalLimit());
-            } else if (alien.getMovementDirection() == DirectEnum.RIGHT) {
-                alien.getAlienPojo().setX(-alien.getAlienPojo().getSize());
-            }
+            alien.getAlienPojo().setX(calculeteAlienXCoordinate(alien));
         }
+    }
+
+    private int calculeteAlienXCoordinate(AlienModel alien) {
+        int coordinate = 0;
+        if (alien.getMovementDirection() == DirectEnum.LEFT) {
+            coordinate = alien.getHorizontalLimit();
+        } else if (alien.getMovementDirection() == DirectEnum.RIGHT) {
+            coordinate = -alien.getAlienPojo().getSize();
+        }
+        return coordinate;
     }
 
     private void putCanonCoordenates() {
@@ -143,13 +163,85 @@ public class GameManager implements ContractPlay.Model {
     @Override
     public void shootBullet() {
         boolean shot = false;
-        for(int i = 0; i < bulletList.size() && !shot; i++) {
-            if(!bulletList.get(i).isRunning()){
+        for (int i = 0; i < bulletList.size() && !shot; i++) {
+            if (!bulletList.get(i).isRunning()) {
                 bulletList.get(i).getBulletPojo().setX(canonModel.getCanonPojo().getX());
                 bulletList.get(i).getBulletPojo().setY(canonModel.getCanonPojo().getY());
                 bulletList.get(i).startMovement();
                 shot = true;
             }
         }
+    }
+
+    private void checkAlienStrikeThread() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                    }
+                    checkAlienShot();
+                    
+                }
+            }
+        });
+        thread.setName("Alien Strake Thread");
+        thread.start();
+    }
+
+    private void checkAlienShot() {
+        boolean collision = false;
+        for (BulletModel bulletModel : bulletList) {
+            synchronized(bulletLock){
+            if (bulletModel.isRunning()) {
+                for (int i = 0; i < alienList.size() && !collision; i++) {
+                    collision = checkCollision(bulletModel, alienList.get(i));
+                }
+            }
+            bulletLock.notifyAll();
+        }
+        }
+    }
+
+    // Check if there is a collision between the bullet and the alien
+    private boolean checkCollision(BulletModel bulletModel, AlienModel alienModel) {
+        boolean collision = false;
+        Point[] bulletCorners = objectCorners(bulletModel.getBulletPojo());
+        Point[] alienCorners = objectCorners(alienModel.getAlienPojo());
+        if (checkPointsCollision(bulletCorners, alienCorners)) {
+            collision = true;
+            alienList.remove(alienModel);
+            alienList.add(createNewAlient());   
+            bulletModel.stopMovement();
+        }
+        return collision;
+    }
+
+    private AlienModel createNewAlient() {
+        AlienModel alien = createAlien();
+        alien.setHorizontalLimit(horizontalLimit);
+        alien.getAlienPojo().setX(calculeteAlienXCoordinate(alien));
+        alien.getAlienPojo().setY(calculeteAlienYCoordinate());
+        alien.startMovement();
+        return alien;
+    }
+
+    private boolean checkPointsCollision(Point[] bulletCorners, Point[] alienCorners) {
+        boolean overlapX = (bulletCorners[0].getX() < alienCorners[3].getX()
+                && bulletCorners[3].getX() > alienCorners[0].getX());
+        boolean overlapY = (bulletCorners[0].getY() < alienCorners[3].getY()
+                && bulletCorners[3].getY() > alienCorners[0].getY());
+        return (overlapX && overlapY);
+    }
+
+    private Point[] objectCorners(ObjectPojo objectPojo) {
+        Point[] corners = new Point[4];
+        corners[0] = new Point(objectPojo.getX(), objectPojo.getY());
+        corners[1] = new Point(objectPojo.getX() + objectPojo.getSize(), objectPojo.getY());
+        corners[2] = new Point(objectPojo.getX(), objectPojo.getY() + objectPojo.getSize());
+        corners[3] = new Point(objectPojo.getX() + objectPojo.getSize(), objectPojo.getY() + objectPojo.getSize());
+        return corners;
     }
 }

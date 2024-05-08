@@ -24,20 +24,24 @@ public class BulletModel {
     }
 
     private void move() {
-        
+
         if (bulletPojo.getY() >= (-bulletPojo.getSize())) {
             bulletPojo.setY(bulletPojo.getY() - speed);
         } else {
-            bulletPojo.setVisible(false);
-            running = false;
+            stopMovement();
         }
-        
+
     }
 
-    public void startMovement(){
+    public void startMovement() {
         bulletPojo.setVisible(true);
         this.running = true;
         threadBullet();
+    }
+
+    public void stopMovement() {
+        bulletPojo.setVisible(false);
+        running = false;
     }
 
     public void setSpeed(int movement) {

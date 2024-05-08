@@ -30,48 +30,6 @@ public class WorkPanel extends JPanel {
         putComponentListener();
     }
 
-    public void setDashboard(Dashboard dashboard) {
-        this.dashboard = dashboard;
-    }
-
-    public void loadObjectsPojo() {
-        aliens = dashboard.getPresenter().getAliensPojo();
-        bullets = dashboard.getPresenter().getBulletsPojo();
-        canon = dashboard.getPresenter().getCanonPojo();
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        for (AlienPojo alienPojo : aliens) {
-            g.drawImage(alienImage, alienPojo.getX(), alienPojo.getY(), alienPojo.getSize(), alienPojo.getSize(), null);
-        }
-        g.drawImage(canonImage, canon.getX(), canon.getY(), canon.getSize(), canon.getSize(), null);
-        for (BulletPojo bulletPojo : bullets) {
-            if (bulletPojo.isVisible()) {
-                g.drawImage(bulletImage, bulletPojo.getX(), bulletPojo.getY(), bulletPojo.getSize(),
-                        bulletPojo.getSize(), null);
-            }
-        }
-    }
-
-    public void threadPaint() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    repaint();
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-        thread.start();
-    }
-
     private void putComponentListener() {
         this.addComponentListener(new ComponentAdapter() {
             @Override
@@ -80,5 +38,51 @@ public class WorkPanel extends JPanel {
                 dashboard.getPresenter().setVerticalLimit(getHeight());
             }
         });
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        g.drawImage(canonImage, canon.getX(), canon.getY(), canon.getSize(), canon.getSize(), null);
+        
+            for (BulletPojo bulletPojo : bullets) {
+                if (bulletPojo.isVisible()) {
+                    g.drawImage(bulletImage, bulletPojo.getX(), bulletPojo.getY(), bulletPojo.getSize(),
+                            bulletPojo.getSize(), null);
+                }
+            }
+        for (AlienPojo alienPojo : aliens) {
+            g.drawImage(alienImage, alienPojo.getX(), alienPojo.getY(), alienPojo.getSize(), alienPojo.getSize(), null);
+        }
+    }
+    
+
+    public void threadPaint() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    loadObjectsPojo();
+                    repaint();
+                    System.out.println("Vista: " + aliens);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+            }
+        });
+        thread.start();
+    }
+
+    public void loadObjectsPojo() {
+        aliens = dashboard.getPresenter().getAliensPojo();
+        bullets = dashboard.getPresenter().getBulletsPojo();
+        canon = dashboard.getPresenter().getCanonPojo();
+    }
+
+    public void setDashboard(Dashboard dashboard) {
+        this.dashboard = dashboard;
     }
 }

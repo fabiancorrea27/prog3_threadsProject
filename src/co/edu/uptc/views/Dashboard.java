@@ -2,7 +2,6 @@ package co.edu.uptc.views;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 
@@ -13,8 +12,9 @@ public class Dashboard extends JFrame implements ContractPlay.View {
 
     private ContractPlay.Presenter presenter;
     private WorkPanel workPanel;
-    
-    public Dashboard(){
+    private int shotKey = KeyEvent.VK_SPACE;
+
+    public Dashboard() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(800, 600);
         this.setLocationRelativeTo(null);
@@ -27,17 +27,16 @@ public class Dashboard extends JFrame implements ContractPlay.View {
         workPanel = new WorkPanel();
         workPanel.setDashboard(this);
         this.add(workPanel);
-        
+
     }
 
     @Override
     public void setPresenter(Presenter presenter) {
-       this.presenter = presenter;
+        this.presenter = presenter;
     }
 
     @Override
     public void begin() {
-        workPanel.loadObjectsPojo();
         workPanel.threadPaint();
         this.setVisible(true);
     }
@@ -56,7 +55,7 @@ public class Dashboard extends JFrame implements ContractPlay.View {
         return getHeight();
     }
 
-    public void putKeyListener(){
+    public void putKeyListener() {
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -65,9 +64,11 @@ public class Dashboard extends JFrame implements ContractPlay.View {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                presenter.shootBullet();
+                if (e.getKeyCode() == shotKey) {
+                    presenter.shootBullet();
+                }
             }
         });
     }
-    
+
 }

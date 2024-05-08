@@ -1,6 +1,6 @@
 package co.edu.uptc.pojos;
 
-public class AlienPojo {
+public class AlienPojo implements ObjectPojo {
     private boolean isAlive;
     private int x;
     private int y;
