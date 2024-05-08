@@ -9,7 +9,7 @@ import co.edu.uptc.pojos.BulletPojo;
 import co.edu.uptc.pojos.CanonPojo;
 import co.edu.uptc.presenters.ContractPlay;
 import co.edu.uptc.presenters.ContractPlay.Presenter;
-import co.edu.uptc.views.DirectEnum;
+import co.edu.uptc.utils.DirectEnum;
 import co.edu.uptc.pojos.ObjectPojo;
 
 public class GameManager implements ContractPlay.Model {
@@ -18,7 +18,8 @@ public class GameManager implements ContractPlay.Model {
     private List<BulletModel> bulletList = new ArrayList<BulletModel>();
     private CanonModel canonModel = new CanonModel();
     private int horizontalLimit, verticalLimit;
-    private final Object bulletLock = new Object();
+    private boolean running = false;
+    private int aliensAmount, aliensEliminatedAmount;
 
     public GameManager() {
 
@@ -31,14 +32,19 @@ public class GameManager implements ContractPlay.Model {
 
     @Override
     public void start() {
+        running = true;
+        createAndAddObjects();
+        aliensAmount = alienList.size();
+        createAliensMovementThread();
+        createBulletsMovementThread();
+        canonModel.startMovement();
+        checkAlienStrikeThread();
+    }
+
+    private void createAndAddObjects() {
         createAndAddAliens();
         createAndAddCanon();
         createAndAddBullets();
-        for (AlienModel alien : alienList) {
-            alien.startMovement();
-        }
-        canonModel.startMovement();
-        checkAlienStrikeThread();
     }
 
     private void createAndAddAliens() {
@@ -74,11 +80,49 @@ public class GameManager implements ContractPlay.Model {
         }
     }
 
+    private void createAliensMovementThread() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (running) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                    for (AlienModel alienModel : alienList) {
+                        alienModel.move();
+                    }
+                }
+            }
+        });
+        thread.setName("Alien Movement Thread");
+        thread.start();
+    }
+
+    private void createBulletsMovementThread() {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (running) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                    }
+                    for (BulletModel bulletModel : bulletList) {
+                        if (bulletModel.getBulletPojo().isVisible()) {
+                            bulletModel.move();
+                        }
+                    }
+                }
+            }
+        });
+        thread.setName("Bullet Movement Thread");
+        thread.start();
+    }
+
     @Override
     public void stop() {
-        for (AlienModel alien : alienList) {
-            alien.stopMovement();
-        }
+        running = false;
     }
 
     @Override
@@ -107,17 +151,17 @@ public class GameManager implements ContractPlay.Model {
     @Override
     public void setHorizontalLimit(int horizontalLimit) {
         this.horizontalLimit = horizontalLimit;
-        putAlienXCoordenate();
+        updateAlienXCoordenate();
     }
 
     @Override
     public void setVerticalLimit(int verticalLimit) {
         this.verticalLimit = verticalLimit;
-        putAlienYCoordinate();
-        putCanonCoordenates();
+        updateAlienYCoordinate();
+        updateCanonCoordenates();
     }
 
-    private void putAlienYCoordinate() {
+    private void updateAlienYCoordinate() {
         // Set aliens y-coordinate on random position in the first half
         for (AlienModel alien : alienList) {
             alien.getAlienPojo().setY(calculeteAlienYCoordinate());
@@ -128,7 +172,7 @@ public class GameManager implements ContractPlay.Model {
         return ((int) (Math.random() * (verticalLimit / 2)));
     }
 
-    private void putAlienXCoordenate() {
+    private void updateAlienXCoordenate() {
         for (AlienModel alien : alienList) {
             // Check aliens direction movement and set x coordenate accordingly
             alien.setHorizontalLimit(horizontalLimit);
@@ -146,7 +190,7 @@ public class GameManager implements ContractPlay.Model {
         return coordinate;
     }
 
-    private void putCanonCoordenates() {
+    private void updateCanonCoordenates() {
         canonModel.setHorizontalLimit(horizontalLimit);
         // Set canon x-coordinate at the middle
         canonModel.getCanonPojo()
@@ -183,7 +227,7 @@ public class GameManager implements ContractPlay.Model {
                     } catch (InterruptedException e) {
                     }
                     checkAlienShot();
-                    
+
                 }
             }
         });
@@ -194,14 +238,11 @@ public class GameManager implements ContractPlay.Model {
     private void checkAlienShot() {
         boolean collision = false;
         for (BulletModel bulletModel : bulletList) {
-            synchronized(bulletLock){
             if (bulletModel.isRunning()) {
                 for (int i = 0; i < alienList.size() && !collision; i++) {
                     collision = checkCollision(bulletModel, alienList.get(i));
                 }
             }
-            bulletLock.notifyAll();
-        }
         }
     }
 
@@ -212,11 +253,18 @@ public class GameManager implements ContractPlay.Model {
         Point[] alienCorners = objectCorners(alienModel.getAlienPojo());
         if (checkPointsCollision(bulletCorners, alienCorners)) {
             collision = true;
-            alienList.remove(alienModel);
-            alienList.add(createNewAlient());   
-            bulletModel.stopMovement();
+            collisionEvent(bulletModel, alienModel);
         }
         return collision;
+    }
+
+    private void collisionEvent(BulletModel bulletModel, AlienModel alienModel) {
+        alienList.remove(alienModel);
+        alienList.add(createNewAlient());
+        bulletModel.stopMovement();
+        aliensEliminatedAmount++;
+        presenter.updateAliensEliminated(aliensEliminatedAmount);
+
     }
 
     private AlienModel createNewAlient() {
@@ -224,7 +272,6 @@ public class GameManager implements ContractPlay.Model {
         alien.setHorizontalLimit(horizontalLimit);
         alien.getAlienPojo().setX(calculeteAlienXCoordinate(alien));
         alien.getAlienPojo().setY(calculeteAlienYCoordinate());
-        alien.startMovement();
         return alien;
     }
 
@@ -244,4 +291,10 @@ public class GameManager implements ContractPlay.Model {
         corners[3] = new Point(objectPojo.getX() + objectPojo.getSize(), objectPojo.getY() + objectPojo.getSize());
         return corners;
     }
+
+    @Override
+    public int getAliensAmount() {
+       return aliensAmount;
+    }
+
 }

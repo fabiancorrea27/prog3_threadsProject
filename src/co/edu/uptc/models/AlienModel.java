@@ -1,13 +1,12 @@
 package co.edu.uptc.models;
 
 import co.edu.uptc.pojos.AlienPojo;
+import co.edu.uptc.utils.DirectEnum;
 import co.edu.uptc.utils.Util;
-import co.edu.uptc.views.DirectEnum;
 
 public class AlienModel {
     private AlienPojo alienPojo = new AlienPojo();
     private DirectEnum movementDirection;
-    private boolean running = true;
     private int horizontalLimit;
     private int speed;
 
@@ -15,24 +14,7 @@ public class AlienModel {
         movementDirection = Util.randomDirection();
     }
 
-    public void startMovement() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (running) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
-                    move();
-                }
-            }
-        });
-        thread.setName("Alien Movement Thread");
-        thread.start();
-    }
-
-    private void move() {
+    public void move() {
         if (movementDirection == DirectEnum.LEFT) {
             moveLeft();
         } else if (movementDirection == DirectEnum.RIGHT) {
@@ -60,10 +42,6 @@ public class AlienModel {
 
     private void rightReubication(){
         alienPojo.setX(-alienPojo.getSize());
-    }
-
-    public void stopMovement() {
-        running = false;
     }
   
     public AlienPojo getAlienPojo() {

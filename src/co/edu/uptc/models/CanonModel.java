@@ -1,7 +1,7 @@
 package co.edu.uptc.models;
 
 import co.edu.uptc.pojos.CanonPojo;
-import co.edu.uptc.views.DirectEnum;
+import co.edu.uptc.utils.DirectEnum;
 
 public class CanonModel {
     private CanonPojo canonPojo = new CanonPojo();

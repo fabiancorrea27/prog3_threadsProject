@@ -1,5 +1,6 @@
 package co.edu.uptc.views;
 
+import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -7,11 +8,13 @@ import javax.swing.JFrame;
 
 import co.edu.uptc.presenters.ContractPlay;
 import co.edu.uptc.presenters.ContractPlay.Presenter;
+import co.edu.uptc.utils.Chronometer;
 
 public class Dashboard extends JFrame implements ContractPlay.View {
 
     private ContractPlay.Presenter presenter;
     private WorkPanel workPanel;
+    private InformationPanel informationPanel;
     private int shotKey = KeyEvent.VK_SPACE;
 
     public Dashboard() {
@@ -19,6 +22,7 @@ public class Dashboard extends JFrame implements ContractPlay.View {
         this.setSize(800, 600);
         this.setLocationRelativeTo(null);
         this.setResizable(false);
+        this.setLayout(new BorderLayout());
         putKeyListener();
         initComponents();
     }
@@ -26,7 +30,9 @@ public class Dashboard extends JFrame implements ContractPlay.View {
     private void initComponents() {
         workPanel = new WorkPanel();
         workPanel.setDashboard(this);
-        this.add(workPanel);
+        informationPanel = new InformationPanel();
+        this.add(informationPanel, BorderLayout.NORTH);
+        this.add(workPanel, BorderLayout.CENTER);
 
     }
 
@@ -37,6 +43,8 @@ public class Dashboard extends JFrame implements ContractPlay.View {
 
     @Override
     public void begin() {
+        createTimer();
+        informationPanel.setAliensAmount(String.valueOf(presenter.getAliensAmount()));
         workPanel.threadPaint();
         this.setVisible(true);
     }
@@ -55,7 +63,7 @@ public class Dashboard extends JFrame implements ContractPlay.View {
         return getHeight();
     }
 
-    public void putKeyListener() {
+    private void putKeyListener() {
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -69,6 +77,29 @@ public class Dashboard extends JFrame implements ContractPlay.View {
                 }
             }
         });
+    }
+
+    private void createTimer() {
+        Chronometer chronometer = new Chronometer();
+        Thread timer = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                    }
+                    chronometer.increaseSeconds();
+                    informationPanel.setTimeValue(chronometer.timerString());
+                }
+            }
+        });
+        timer.start();
+    }
+
+    @Override
+    public void updateAliensEliminated(int amount) {
+        informationPanel.setAliensEliminatedAmount(String.valueOf(amount));
     }
 
 }

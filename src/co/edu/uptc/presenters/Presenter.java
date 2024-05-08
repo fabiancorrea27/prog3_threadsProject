@@ -9,8 +9,8 @@ import co.edu.uptc.pojos.BulletPojo;
 import co.edu.uptc.pojos.CanonPojo;
 import co.edu.uptc.presenters.ContractPlay.Model;
 import co.edu.uptc.presenters.ContractPlay.View;
+import co.edu.uptc.utils.DirectEnum;
 import co.edu.uptc.views.Dashboard;
-import co.edu.uptc.views.DirectEnum;
 
 public class Presenter implements ContractPlay.Presenter {
     private ContractPlay.Model model;
@@ -94,4 +94,15 @@ public class Presenter implements ContractPlay.Presenter {
     public void setVerticalLimit(int verticalLimit) {
         model.setVerticalLimit(verticalLimit);
     }
+
+    @Override
+    public void updateAliensEliminated(int amount) {
+        view.updateAliensEliminated(amount);
+    }
+
+    @Override
+    public int getAliensAmount() {
+       return model.getAliensAmount();
+    }
+
 }

@@ -64,7 +64,6 @@ public class WorkPanel extends JPanel {
                 while (true) {
                     loadObjectsPojo();
                     repaint();
-                    System.out.println("Vista: " + aliens);
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {

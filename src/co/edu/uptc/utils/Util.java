@@ -1,7 +1,5 @@
 package co.edu.uptc.utils;
 
-import co.edu.uptc.views.DirectEnum;
-
 public class Util {
     
     public static DirectEnum randomDirection(){

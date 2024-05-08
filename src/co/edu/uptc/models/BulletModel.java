@@ -7,24 +7,9 @@ public class BulletModel {
     private boolean running;
     private int speed;
 
-    public void threadBullet() {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (running) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
-                    move();
-                }
-            }
-        });
-        thread.start();
-    }
+    
 
-    private void move() {
-
+    public void move() {
         if (bulletPojo.getY() >= (-bulletPojo.getSize())) {
             bulletPojo.setY(bulletPojo.getY() - speed);
         } else {
@@ -35,8 +20,7 @@ public class BulletModel {
 
     public void startMovement() {
         bulletPojo.setVisible(true);
-        this.running = true;
-        threadBullet();
+        running = true;
     }
 
     public void stopMovement() {
