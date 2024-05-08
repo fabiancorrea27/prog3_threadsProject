@@ -25,4 +25,13 @@ public class ImagesUtil {
         }
         return image;
     }
+    public static BufferedImage bulletImage() {
+        BufferedImage image = null;
+        try {
+            image = ImageIO.read(new File("resources\\bullet.png"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
 }

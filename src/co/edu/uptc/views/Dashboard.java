@@ -1,5 +1,9 @@
 package co.edu.uptc.views;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 import javax.swing.JFrame;
 
 import co.edu.uptc.presenters.ContractPlay;
@@ -14,7 +18,8 @@ public class Dashboard extends JFrame implements ContractPlay.View {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(800, 600);
         this.setLocationRelativeTo(null);
-        
+        this.setResizable(false);
+        putKeyListener();
         initComponents();
     }
 
@@ -34,7 +39,6 @@ public class Dashboard extends JFrame implements ContractPlay.View {
     public void begin() {
         workPanel.loadObjectsPojo();
         workPanel.threadPaint();
-        
         this.setVisible(true);
     }
 
@@ -50,6 +54,20 @@ public class Dashboard extends JFrame implements ContractPlay.View {
     @Override
     public int verticalLimit() {
         return getHeight();
+    }
+
+    public void putKeyListener(){
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                presenter.canonMovement(e.getKeyCode());
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                presenter.shootBullet();
+            }
+        });
     }
     
 }

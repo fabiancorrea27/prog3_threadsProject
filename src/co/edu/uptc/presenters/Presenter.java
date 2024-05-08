@@ -1,5 +1,6 @@
 package co.edu.uptc.presenters;
 
+import java.awt.event.KeyEvent;
 import java.util.List;
 
 import co.edu.uptc.models.GameManager;
@@ -9,11 +10,13 @@ import co.edu.uptc.pojos.CanonPojo;
 import co.edu.uptc.presenters.ContractPlay.Model;
 import co.edu.uptc.presenters.ContractPlay.View;
 import co.edu.uptc.views.Dashboard;
+import co.edu.uptc.views.DirectEnum;
 
 public class Presenter implements ContractPlay.Presenter {
     private ContractPlay.Model model;
     private ContractPlay.View view;
 
+    
     @Override
     public void setModel(Model model) {
         this.model = model;
@@ -39,6 +42,20 @@ public class Presenter implements ContractPlay.Presenter {
         GameManager gameManager = new GameManager();
         gameManager.setPresenter(this);
         setModel(gameManager);
+    }
+
+    @Override
+    public void canonMovement(int keyCode) {
+        if(keyCode == KeyEvent.VK_LEFT){
+            model.moveCanon(DirectEnum.LEFT);
+        } else if (keyCode == KeyEvent.VK_RIGHT) {
+            model.moveCanon(DirectEnum.RIGHT);
+        }
+    }
+    
+    @Override
+    public void shootBullet() {
+        model.shootBullet();
     }
 
     @Override
@@ -77,6 +94,4 @@ public class Presenter implements ContractPlay.Presenter {
     public void setVerticalLimit(int verticalLimit) {
         model.setVerticalLimit(verticalLimit);
     }
-    
-
 }

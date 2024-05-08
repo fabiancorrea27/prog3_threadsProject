@@ -9,7 +9,7 @@ public class AlienModel {
     private DirectEnum movementDirection;
     private boolean running = true;
     private int horizontalLimit;
-    private int movement;
+    private int speed;
 
     public AlienModel(){
         movementDirection = Util.randomDirection();
@@ -33,14 +33,14 @@ public class AlienModel {
 
     private void move() {
         if (movementDirection == DirectEnum.LEFT) {
-            left();
+            moveLeft();
         } else if (movementDirection == DirectEnum.RIGHT) {
-            right();
+            moveRight();
         }
     }
 
-    private void left() {
-        alienPojo.setX(alienPojo.getX() - movement);
+    private void moveLeft() {
+        alienPojo.setX(alienPojo.getX() - speed);
         if (alienPojo.getX() <= (-alienPojo.getSize())) {
             leftReubication();
         }
@@ -50,8 +50,8 @@ public class AlienModel {
         alienPojo.setX(horizontalLimit);
     }
 
-    private void right() {
-        alienPojo.setX(alienPojo.getX() + movement);
+    private void moveRight() {
+        alienPojo.setX(alienPojo.getX() + speed);
         if (alienPojo.getX() >= horizontalLimit) {
             rightReubication();
         }
@@ -79,8 +79,8 @@ public class AlienModel {
         return horizontalLimit;
     }
 
-    public void setMovement(int movement) {
-        this.movement = movement;
+    public void setSpeed(int movement) {
+        this.speed = movement;
     }
     
     

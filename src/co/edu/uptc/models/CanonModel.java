@@ -6,29 +6,35 @@ import co.edu.uptc.views.DirectEnum;
 public class CanonModel {
     private CanonPojo canonPojo = new CanonPojo();
     private int horizontalLimit;
-    private boolean running = false;
-    private int movement;
+    private boolean running;
+    private int speed;
 
-    public void move(DirectEnum direction) {
-        if (running) {
-            if (direction == DirectEnum.LEFT) {
-                left();
-            } else if (direction == DirectEnum.RIGHT) {
-                right();
-            }
+    public void move(DirectEnum direction){
+        if(direction == DirectEnum.LEFT){
+            left();
+        } else if(direction == DirectEnum.RIGHT){
+            right();
         }
     }
 
     private void left() {
-        if (canonPojo.getX() <= 0) {
-            canonPojo.setX(canonPojo.getX() - movement);
+        if (running && (canonPojo.getX() >= 0)) {
+            canonPojo.setX(canonPojo.getX() - speed);
+            if(canonPojo.getX() < 0){
+                canonPojo.setX(0);
+            }
         }
+        System.out.println(canonPojo.getX());
     }
 
     private void right() {
-        if (canonPojo.getX() >= (horizontalLimit - canonPojo.getSize())) {
-            canonPojo.setX(canonPojo.getX() + movement);
+        if (running && (canonPojo.getX() <= (horizontalLimit - canonPojo.getSize()))) {
+            canonPojo.setX(canonPojo.getX() + speed);
+            if(canonPojo.getX() > (horizontalLimit - canonPojo.getSize())){
+                canonPojo.setX(horizontalLimit - canonPojo.getSize());
+            }
         }
+        System.out.println(canonPojo.getX());
     }
 
     public void startMovement() {
@@ -47,8 +53,8 @@ public class CanonModel {
         this.horizontalLimit = horizontalLimit;
     }
 
-    public void setMovement(int movement){
-        this.movement = movement;
+    public void setSpeed(int movement){
+        this.speed = movement;
     }
 
     public int getHorizontalLimit(){
