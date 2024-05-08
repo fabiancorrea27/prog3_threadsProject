@@ -36,7 +36,7 @@ public class KeyDialog extends JDialog {
     private void initComponents(ActionListener actionListener) {
         lblPress = new CustomLabel(ConfigValue.getProperty("keyPressText"), JLabel.CENTER);
         lblKey = new CustomLabel("", JLabel.CENTER);
-        lblKey.setPreferredSize(new Dimension(60, 20));
+        lblKey.setPreferredSize(new Dimension(100, 20));
         lblKey.setForeground(Color.GREEN);
         btnDone = new JButton(ConfigValue.getProperty("buttonDoneText"));
         btnDone.addActionListener(actionListener);
@@ -53,23 +53,19 @@ public class KeyDialog extends JDialog {
         this.add(btnDone, gbc);
     }
 
-    
     private void putKeyListener() {
         this.requestFocus();
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
-                lblKey.setText((String.valueOf(e.getKeyChar()).toUpperCase()));
+                lblKey.setText(KeyEvent.getKeyText(e.getKeyCode()));
             }
-           
         });
     }
 
-
-
     public char getKeyChar() {
         char key = Character.MIN_VALUE;
-        if(lblKey.getText() != ""){
+        if (lblKey.getText() != "") {
             key = lblKey.getText().charAt(0);
         }
         return key;
