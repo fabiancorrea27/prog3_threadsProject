@@ -69,12 +69,6 @@ public class Presenter implements ContractPlay.Presenter {
     }
 
     @Override
-    public void stop() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'stop'");
-    }
-
-    @Override
     public List<BulletPojo> getBulletsPojo() {
         return model.getBulletsPojo();
     }

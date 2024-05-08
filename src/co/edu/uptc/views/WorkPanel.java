@@ -1,5 +1,6 @@
 package co.edu.uptc.views;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -11,11 +12,12 @@ import javax.swing.JPanel;
 import co.edu.uptc.pojos.AlienPojo;
 import co.edu.uptc.pojos.BulletPojo;
 import co.edu.uptc.pojos.CanonPojo;
+import co.edu.uptc.utils.ConfigValue;
 import co.edu.uptc.utils.ImagesUtil;
+import co.edu.uptc.utils.Util;
 
 public class WorkPanel extends JPanel {
     private Dashboard dashboard;
-    // private boolean running;
     private BufferedImage alienImage;
     private BufferedImage canonImage;
     private BufferedImage bulletImage;
@@ -27,6 +29,7 @@ public class WorkPanel extends JPanel {
         alienImage = ImagesUtil.alienImage();
         canonImage = ImagesUtil.canonImage();
         bulletImage = ImagesUtil.bulletImage();
+        this.setBackground(new Color(255, 247, 112));
         putComponentListener();
     }
 
@@ -43,32 +46,30 @@ public class WorkPanel extends JPanel {
     @Override
     public void paint(Graphics g) {
         super.paint(g);
-        g.drawImage(canonImage, canon.getX(), canon.getY(), canon.getSize(), canon.getSize(), null);
-        
-            for (BulletPojo bulletPojo : bullets) {
-                if (bulletPojo.isVisible()) {
-                    g.drawImage(bulletImage, bulletPojo.getX(), bulletPojo.getY(), bulletPojo.getSize(),
-                            bulletPojo.getSize(), null);
-                }
+        if (canon != null) {
+            g.drawImage(canonImage, canon.getX(), canon.getY(), canon.getSize(), canon.getSize(), null);
+        }
+        for (BulletPojo bulletPojo : bullets) {
+            if (bulletPojo.isVisible()) {
+                g.drawImage(bulletImage, bulletPojo.getX(), bulletPojo.getY(), bulletPojo.getSize(),
+                        bulletPojo.getSize(), null);
             }
+        }
+
         for (AlienPojo alienPojo : aliens) {
             g.drawImage(alienImage, alienPojo.getX(), alienPojo.getY(), alienPojo.getSize(), alienPojo.getSize(), null);
         }
     }
-    
 
     public void threadPaint() {
+        int threadDelay = Integer.parseInt(ConfigValue.getProperty("aliensThreadDelay"));
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
+                    Util.sleep(threadDelay);
                     loadObjectsPojo();
                     repaint();
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-
-                    }
                 }
             }
         });

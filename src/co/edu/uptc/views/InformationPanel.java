@@ -13,6 +13,7 @@ public class InformationPanel extends JPanel {
     private JLabel lblTime, lblTimeValue, lblAliens, lblAliensAmount, lblAliensEliminated, lblAliensEliminatedAmount;
 
     public InformationPanel() {
+        this.setBackground(new Color(252, 240, 56));
         initComponents();
         addComponents();
     }

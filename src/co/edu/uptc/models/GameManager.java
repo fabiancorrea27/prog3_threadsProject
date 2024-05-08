@@ -7,10 +7,12 @@ import java.util.List;
 import co.edu.uptc.pojos.AlienPojo;
 import co.edu.uptc.pojos.BulletPojo;
 import co.edu.uptc.pojos.CanonPojo;
+import co.edu.uptc.pojos.ObjectPojo;
 import co.edu.uptc.presenters.ContractPlay;
 import co.edu.uptc.presenters.ContractPlay.Presenter;
+import co.edu.uptc.utils.ConfigValue;
 import co.edu.uptc.utils.DirectEnum;
-import co.edu.uptc.pojos.ObjectPojo;
+import co.edu.uptc.utils.Util;
 
 public class GameManager implements ContractPlay.Model {
     private ContractPlay.Presenter presenter;
@@ -48,7 +50,8 @@ public class GameManager implements ContractPlay.Model {
     }
 
     private void createAndAddAliens() {
-        for (int i = 0; i < 5; i++) {
+        int aliensAmount = Integer.parseInt(ConfigValue.getProperty("aliensAmount"));
+        for (int i = 0; i < aliensAmount; i++) {
             AlienModel alien = createAlien();
             alienList.add(alien);
         }
@@ -56,58 +59,64 @@ public class GameManager implements ContractPlay.Model {
 
     // Create a Alien with a initial position
     private AlienModel createAlien() {
+        int alienMinSize = Integer.parseInt(ConfigValue.getProperty("alienMinSize"));
+        int alienMaxSize = Integer.parseInt(ConfigValue.getProperty("alienMaxSize"));
+        int alienMinSpeed = Integer.parseInt(ConfigValue.getProperty("alienMinSpeed"));
+        int alienMaxSpeed = Integer.parseInt(ConfigValue.getProperty("alienMaxSpeed"));
         AlienModel alien = new AlienModel();
-        alien.getAlienPojo().setSize(50);
-        alien.setSpeed(10);
+        alien.getAlienPojo().setSize((int) (Math.random() * (alienMaxSize - alienMinSize + 1)) + alienMinSize);
+        alien.setSpeed((int) (Math.random() * (alienMaxSpeed - alienMinSpeed + 1)) + alienMinSpeed);
         alien.getAlienPojo().setX(-alien.getAlienPojo().getSize());
         alien.getAlienPojo().setY(-alien.getAlienPojo().getSize());
         return alien;
     }
 
     private void createAndAddCanon() {
+        int canonSize = Integer.parseInt(ConfigValue.getProperty("canonSize"));
+        int canonSpeed = Integer.parseInt(ConfigValue.getProperty("canonSpeed"));
         CanonModel canon = new CanonModel();
-        canon.getCanonPojo().setSize(60);
-        canon.setSpeed(10);
+        canon.getCanonPojo().setSize(canonSize);
+        canon.setSpeed(canonSpeed);
         this.canonModel = canon;
     }
 
     private void createAndAddBullets() {
-        for (int i = 0; i < 5; i++) {
+        int bulletsAmount = Integer.parseInt(ConfigValue.getProperty("bulletsAmount"));
+        int bulletSpeed = Integer.parseInt(ConfigValue.getProperty("bulletSpeed"));
+        int bulletSize = Integer.parseInt(ConfigValue.getProperty("bulletSize"));
+        for (int i = 0; i < bulletsAmount; i++) {
             BulletModel bullet = new BulletModel();
-            bullet.setSpeed(10);
-            bullet.getBulletPojo().setSize(60);
+            bullet.setSpeed(bulletSpeed);
+            bullet.getBulletPojo().setSize(bulletSize);
             bulletList.add(bullet);
         }
     }
 
     private void createAliensMovementThread() {
+        int threadDelay = Integer.parseInt(ConfigValue.getProperty("aliensThreadDelay"));
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (running) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
-                    for (AlienModel alienModel : alienList) {
-                        alienModel.move();
+                   Util.sleep(threadDelay);
+                    
+                    for (int i = 0; i < alienList.size(); i++) {
+                        alienList.get(i).move();
                     }
                 }
             }
         });
-        thread.setName("Alien Movement Thread");
+        thread.setName(ConfigValue.getProperty("aliensThreadName"));
         thread.start();
     }
 
     private void createBulletsMovementThread() {
+        int threadDelay = Integer.parseInt(ConfigValue.getProperty("bulletsThreadDelay"));
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (running) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
+                   Util.sleep(threadDelay);
                     for (BulletModel bulletModel : bulletList) {
                         if (bulletModel.getBulletPojo().isVisible()) {
                             bulletModel.move();
@@ -116,20 +125,16 @@ public class GameManager implements ContractPlay.Model {
                 }
             }
         });
-        thread.setName("Bullet Movement Thread");
+        thread.setName(ConfigValue.getProperty("bulletsThreadName"));
         thread.start();
     }
 
     @Override
-    public void stop() {
-        running = false;
-    }
-
-    @Override
     public List<AlienPojo> getAliensPojo() {
+
         List<AlienPojo> alienPojoList = new ArrayList<AlienPojo>();
-        for (AlienModel alien : alienList) {
-            alienPojoList.add(alien.getAlienPojo());
+        for (int i = 0; i < alienList.size(); i++) {
+            alienPojoList.add(alienList.get(i).getAlienPojo());
         }
         return alienPojoList;
     }
@@ -164,11 +169,11 @@ public class GameManager implements ContractPlay.Model {
     private void updateAlienYCoordinate() {
         // Set aliens y-coordinate on random position in the first half
         for (AlienModel alien : alienList) {
-            alien.getAlienPojo().setY(calculeteAlienYCoordinate());
+            alien.getAlienPojo().setY(calculateAlienYCoordinate());
         }
     }
 
-    private int calculeteAlienYCoordinate() {
+    private int calculateAlienYCoordinate() {
         return ((int) (Math.random() * (verticalLimit / 2)));
     }
 
@@ -176,11 +181,11 @@ public class GameManager implements ContractPlay.Model {
         for (AlienModel alien : alienList) {
             // Check aliens direction movement and set x coordenate accordingly
             alien.setHorizontalLimit(horizontalLimit);
-            alien.getAlienPojo().setX(calculeteAlienXCoordinate(alien));
+            alien.getAlienPojo().setX(calculateAlienXCoordinate(alien));
         }
     }
 
-    private int calculeteAlienXCoordinate(AlienModel alien) {
+    private int calculateAlienXCoordinate(AlienModel alien) {
         int coordinate = 0;
         if (alien.getMovementDirection() == DirectEnum.LEFT) {
             coordinate = alien.getHorizontalLimit();
@@ -208,8 +213,14 @@ public class GameManager implements ContractPlay.Model {
     public void shootBullet() {
         boolean shot = false;
         for (int i = 0; i < bulletList.size() && !shot; i++) {
+            // Verify if the bullet is already used
             if (!bulletList.get(i).isRunning()) {
-                bulletList.get(i).getBulletPojo().setX(canonModel.getCanonPojo().getX());
+                // Set x-coordinate of bullet to the middle of the canon
+                bulletList.get(i).getBulletPojo()
+                        .setX(canonModel.getCanonPojo().getX() + (canonModel.getCanonPojo().getSize() / 2)
+                                - (bulletList.get(i).getBulletPojo().getSize() / 2));
+
+                // Set y-coordinate of the bullet to the same position of the canon
                 bulletList.get(i).getBulletPojo().setY(canonModel.getCanonPojo().getY());
                 bulletList.get(i).startMovement();
                 shot = true;
@@ -218,20 +229,18 @@ public class GameManager implements ContractPlay.Model {
     }
 
     private void checkAlienStrikeThread() {
+        int threadDelay = Integer.parseInt(ConfigValue.getProperty("alienStrikeThreadDelay"));
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
-                    try {
-                        Thread.sleep(10);
-                    } catch (InterruptedException e) {
-                    }
+                   Util.sleep(threadDelay);
                     checkAlienShot();
 
                 }
             }
         });
-        thread.setName("Alien Strake Thread");
+        thread.setName(ConfigValue.getProperty("alienStrikeThreadName"));
         thread.start();
     }
 
@@ -258,6 +267,7 @@ public class GameManager implements ContractPlay.Model {
         return collision;
     }
 
+    // Actions to do when the collision is detected
     private void collisionEvent(BulletModel bulletModel, AlienModel alienModel) {
         alienList.remove(alienModel);
         alienList.add(createNewAlient());
@@ -270,8 +280,8 @@ public class GameManager implements ContractPlay.Model {
     private AlienModel createNewAlient() {
         AlienModel alien = createAlien();
         alien.setHorizontalLimit(horizontalLimit);
-        alien.getAlienPojo().setX(calculeteAlienXCoordinate(alien));
-        alien.getAlienPojo().setY(calculeteAlienYCoordinate());
+        alien.getAlienPojo().setX(calculateAlienXCoordinate(alien));
+        alien.getAlienPojo().setY(calculateAlienYCoordinate());
         return alien;
     }
 
@@ -294,7 +304,7 @@ public class GameManager implements ContractPlay.Model {
 
     @Override
     public int getAliensAmount() {
-       return aliensAmount;
+        return aliensAmount;
     }
 
 }

@@ -11,7 +11,6 @@ public interface ContractPlay {
     public interface  Model {
         public void setPresenter(Presenter presenter);
         public void start();
-        public void stop();
         public List<AlienPojo> getAliensPojo();
         public List<BulletPojo> getBulletsPojo();
         public CanonPojo getCanonPojo();
@@ -46,7 +45,7 @@ public interface ContractPlay {
         public void setHorizontalLimit(int horizontalLimit);
         public void setVerticalLimit(int verticalLimit);
         public void start();
-        public void stop();
+    
         
     }
 

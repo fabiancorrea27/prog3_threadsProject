@@ -9,17 +9,20 @@ import javax.swing.JFrame;
 import co.edu.uptc.presenters.ContractPlay;
 import co.edu.uptc.presenters.ContractPlay.Presenter;
 import co.edu.uptc.utils.Chronometer;
+import co.edu.uptc.utils.ConfigValue;
 
 public class Dashboard extends JFrame implements ContractPlay.View {
 
     private ContractPlay.Presenter presenter;
     private WorkPanel workPanel;
     private InformationPanel informationPanel;
-    private int shotKey = KeyEvent.VK_SPACE;
+    private KeyDialog keyDialog;
+    private int shotKey;
 
     public Dashboard() {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(800, 600);
+        this.setSize(Integer.parseInt(ConfigValue.getProperty("windowWidth")),
+                Integer.parseInt(ConfigValue.getProperty("windowHeight")));
         this.setLocationRelativeTo(null);
         this.setResizable(false);
         this.setLayout(new BorderLayout());
@@ -31,9 +34,20 @@ public class Dashboard extends JFrame implements ContractPlay.View {
         workPanel = new WorkPanel();
         workPanel.setDashboard(this);
         informationPanel = new InformationPanel();
+        initDialog();
         this.add(informationPanel, BorderLayout.NORTH);
         this.add(workPanel, BorderLayout.CENTER);
 
+    }
+
+    private void initDialog() {
+        keyDialog = new KeyDialog(e -> {
+            if (keyDialog.getKeyChar() != Character.MIN_VALUE) {
+                shotKey = keyDialog.getKeyChar();
+                keyDialog.dispose();
+                startGameView();
+            }
+        });
     }
 
     @Override
@@ -43,6 +57,10 @@ public class Dashboard extends JFrame implements ContractPlay.View {
 
     @Override
     public void begin() {
+        keyDialog.setVisible(true);
+    }
+
+    public void startGameView() {
         createTimer();
         informationPanel.setAliensAmount(String.valueOf(presenter.getAliensAmount()));
         workPanel.threadPaint();
