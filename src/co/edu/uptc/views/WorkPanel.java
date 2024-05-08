@@ -49,15 +49,19 @@ public class WorkPanel extends JPanel {
         if (canon != null) {
             g.drawImage(canonImage, canon.getX(), canon.getY(), canon.getSize(), canon.getSize(), null);
         }
-        for (BulletPojo bulletPojo : bullets) {
-            if (bulletPojo.isVisible()) {
-                g.drawImage(bulletImage, bulletPojo.getX(), bulletPojo.getY(), bulletPojo.getSize(),
-                        bulletPojo.getSize(), null);
+        if (bullets != null) {
+            for (BulletPojo bulletPojo : bullets) {
+                if (bulletPojo.isVisible()) {
+                    g.drawImage(bulletImage, bulletPojo.getX(), bulletPojo.getY(), bulletPojo.getSize(),
+                            bulletPojo.getSize(), null);
+                }
             }
         }
-
-        for (AlienPojo alienPojo : aliens) {
-            g.drawImage(alienImage, alienPojo.getX(), alienPojo.getY(), alienPojo.getSize(), alienPojo.getSize(), null);
+        if (aliens != null) {
+            for (AlienPojo alienPojo : aliens) {
+                g.drawImage(alienImage, alienPojo.getX(), alienPojo.getY(), alienPojo.getSize(), alienPojo.getSize(),
+                        null);
+            }
         }
     }
 

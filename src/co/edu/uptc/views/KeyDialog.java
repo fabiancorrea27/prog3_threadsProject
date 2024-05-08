@@ -19,6 +19,7 @@ import co.edu.uptc.views.customComponents.CustomLabel;
 public class KeyDialog extends JDialog {
     private JLabel lblPress, lblKey;
     private JButton btnDone;
+    private int keyCode;
 
     public KeyDialog(ActionListener actionListener) {
         this.setSize(Integer.parseInt(ConfigValue.getProperty("dialogWidth")),
@@ -59,15 +60,12 @@ public class KeyDialog extends JDialog {
             @Override
             public void keyReleased(KeyEvent e) {
                 lblKey.setText(KeyEvent.getKeyText(e.getKeyCode()));
+                keyCode = e.getKeyCode();
             }
         });
     }
 
-    public char getKeyChar() {
-        char key = Character.MIN_VALUE;
-        if (lblKey.getText() != "") {
-            key = lblKey.getText().charAt(0);
-        }
-        return key;
+    public int getKeyCode() {
+        return keyCode;
     }
 }

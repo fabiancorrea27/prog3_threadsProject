@@ -42,11 +42,9 @@ public class Dashboard extends JFrame implements ContractPlay.View {
 
     private void initDialog() {
         keyDialog = new KeyDialog(e -> {
-            if (keyDialog.getKeyChar() != Character.MIN_VALUE) {
-                shotKey = keyDialog.getKeyChar();
+                shotKey = keyDialog.getKeyCode();
                 keyDialog.dispose();
                 startGameView();
-            }
         });
     }
 
